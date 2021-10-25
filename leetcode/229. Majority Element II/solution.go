@@ -9,7 +9,7 @@ func majorityElement(nums []int) []int {
 	var first, second, countFirst, countSecond int
 
 	for i := range nums {
-		if countFirst == 0 || nums[i] == first {
+		if (countFirst == 0 || nums[i] == first) && nums[i] != second {
 			first = nums[i]
 			countFirst++
 		} else if countSecond == 0 || nums[i] == second {
@@ -22,8 +22,6 @@ func majorityElement(nums []int) []int {
 
 	}
 
-	//fmt.Println(first, countFirst, second, countSecond)
-
 	countFirst, countSecond = 0, 0
 	for i := range nums {
 		if nums[i] == first {
@@ -33,15 +31,17 @@ func majorityElement(nums []int) []int {
 		}
 	}
 
-	if countSecond > len(nums)/3 {
-		return []int{first, second}
-	}
+	var ret []int
 
 	if countFirst > len(nums)/3 {
-		return []int{first}
+		ret = append(ret, first)
 	}
 
-	return []int{}
+	if countSecond > len(nums)/3 {
+		ret = append(ret, second)
+	}
+
+	return ret
 }
 
 func main() {
@@ -77,6 +77,11 @@ func main() {
 			"test4",
 			args{digits: []int{6, 5, 5}},
 			[]int{5},
+		},
+		{
+			"test5",
+			args{digits: []int{2, 1, 1, 3, 1, 4, 5, 6}},
+			[]int{1},
 		},
 	}
 	for _, tt := range tests {
