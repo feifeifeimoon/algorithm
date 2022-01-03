@@ -1,45 +1,37 @@
 package main
 
 import (
-	"container/list"
 	"fmt"
 	"reflect"
 )
 
+// 三色标记
+// 0 - 初始颜色
+// 1 - 正常标记队列中
+// 2 - 确认是安全节点
 func eventualSafeNodes(graph [][]int) []int {
-	inDeg := make([]int, len(graph))
-	matrix := make([][]int, len(graph))
-	for i, v := range graph {
-		for _, k := range v {
-			matrix[k] = append(matrix[k], i)
+	color := make([]int, len(graph))
+
+	var dfs func(i int) bool
+	dfs = func(i int) bool {
+		if color[i] != 0 {
+			// 如果color不是0 证明在队列中 或者已经标记完
+			return color[i] == 2
 		}
-		inDeg[i] = len(v)
-	}
-
-	queue := list.New()
-	for i := range inDeg {
-		if inDeg[i] == 0 {
-			queue.PushBack(i)
-		}
-	}
-
-	for queue.Len() > 0 {
-		elem := queue.Front()
-		val := elem.Value.(int)
-
-		for _, v := range matrix[val] {
-			inDeg[v]--
-			if inDeg[v] == 0 {
-				queue.PushBack(v)
+		color[i] = 1
+		for _, v := range graph[i] {
+			// 如果有一个节点不是安全节点
+			if !dfs(v) {
+				return false
 			}
 		}
-
-		queue.Remove(elem)
+		color[i] = 2
+		return true
 	}
 
 	var ret []int
-	for i := range inDeg {
-		if inDeg[i] == 0 {
+	for i := 0; i < len(graph); i++ {
+		if dfs(i) {
 			ret = append(ret, i)
 		}
 	}
