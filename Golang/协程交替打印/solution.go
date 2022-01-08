@@ -9,32 +9,30 @@ import (
 )
 
 func main() {
-	fmt.Println("Hello, world")
-
-	gCh := make(chan int)
-
 	var wg sync.WaitGroup
 	wg.Add(2)
-	ch1, ch2 := make(chan struct{}, 1), make(chan struct{}, 1)
-	print := func(ch1 <-chan struct{}, ch2 chan struct{}) {
-		defer wg.Done()
-		for {
-			<-ch1
-			v := <-gCh
-			fmt.Println(v)
-			ch2 <- struct{}{}
-			if v == 99 || v == 100 {
-				break
-			}
-		}
-	}
 
-	go print(ch1, ch2)
-	go print(ch2, ch1)
+	ch1, ch2 := make(chan struct{}, 1), make(chan struct{})
+
+	go func() {
+		defer wg.Done()
+		for i := 1; i < 100; i += 2 {
+			<-ch1
+			fmt.Println(i)
+			ch2 <- struct{}{}
+		}
+	}()
+
+	go func() {
+		defer wg.Done()
+		for i := 2; i <= 100; i += 2 {
+			<-ch2
+			fmt.Println(i)
+			ch1 <- struct{}{}
+		}
+	}()
+
 	ch1 <- struct{}{}
-	for i := 1; i <= 100; i++ {
-		gCh <- i
-	}
 
 	wg.Wait()
 }
