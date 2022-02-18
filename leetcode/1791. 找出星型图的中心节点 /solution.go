@@ -6,18 +6,10 @@ import (
 )
 
 func findCenter(edges [][]int) int {
-	flag := make([]int, len(edges)+2)
-	for _, edge := range edges {
-		flag[edge[0]]++
-		flag[edge[1]]++
+	if edges[0][0] == edges[1][0] || edges[0][0] == edges[1][1] {
+		return edges[0][0]
 	}
-
-	for i := range flag {
-		if flag[i] == len(edges) {
-			return i
-		}
-	}
-	return 0
+	return edges[0][1]
 }
 
 func main() {
